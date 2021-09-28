@@ -18,6 +18,10 @@ exports.getOneSauce = (req, res, next) => {
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);
     delete sauceObject._id;
+    if (!sauceObject.name || !sauceObject.manufacturer || !sauceObject.description || !sauceObject.mainPepper || !sauceObject.imageUrl || !sauceObject.heat || !sauceObject.likes || !sauceObject.dislikes)
+    {
+        return res.status(400).json({error : "something is missing"})
+    }
     //create new sauce
     const sauce = new ModelsSauce({
       ...sauceObject,
@@ -41,7 +45,7 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 exports.likeSauce = (req, res, next) => {
-    
+    ModelsSauce.findOne({ _id: req.params.id })
 };
 
 
