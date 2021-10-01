@@ -53,21 +53,27 @@ exports.likeSauce = (req, res, next) => {
 
     function gestionDeLikes(sauce) {
         if (like === -1) {
-            if (!sauce.usersLiked.includes(userId) || !sauce.usersDisliked.includes(userId)){
+            if (!(sauce.usersLiked.includes(userId)) && !(sauce.usersDisliked.includes(userId))){
                 console.log(`La personne dislike la sauce ${sauceId}`)
                 sauce.usersDisliked.push(userId)
                 sauce.dislikes++
                 sauce.save()
                 console.log(sauce)
             }
+            else {
+                res.status(400).json({error : "Vous n'avez déja pas aimé la sauce"})
+            }
         }
         else if (like === 1) {
-            if (!sauce.usersLiked.includes(userId) || !sauce.usersDisliked.includes(userId)){
+            if (!sauce.usersLiked.includes(userId) && !sauce.usersDisliked.includes(userId)){
                 console.log(`La personne like la sauce ${sauceId}`)
                 sauce.usersLiked.push(userId)
                 sauce.likes++
                 sauce.save()
                 console.log(sauce)
+            }
+            else {
+                res.status(400).json({error : "Vous avez déja aimé la sauce"})
             }
         }
         else if (like === 0) {
@@ -85,7 +91,10 @@ exports.likeSauce = (req, res, next) => {
             sauce.dislikes--
             sauce.save()
             console.log(sauce)
-         }
+            }
+            else {
+                res.status(400).json({error : "Vous avez déja unlike la sauce"})
+            }
         }
         else {
            console.log('Erreur')
@@ -104,6 +113,7 @@ exports.likeSauce = (req, res, next) => {
             else {
                 gestionDeLikes(sauce)
             }
+            res.status(200).json({ message: 'like updated !'})
         })
         .catch(error => res.status(400).json({ error }));
     }
