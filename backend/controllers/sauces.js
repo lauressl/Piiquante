@@ -59,9 +59,10 @@ exports.likeSauce = (req, res, next) => {
                 sauce.dislikes++
                 sauce.save()
                 console.log(sauce)
+                res.status(200).json({ message: "Vous n'aimez pas la sauce !"})
             }
             else {
-                res.status(400).json({error : "Vous n'avez déja pas aimé la sauce"})
+                res.status(403).json({error : "Vous ne pouvez pas dislike la sauce"})
             }
         }
         else if (like === 1) {
@@ -71,9 +72,11 @@ exports.likeSauce = (req, res, next) => {
                 sauce.likes++
                 sauce.save()
                 console.log(sauce)
+                res.status(200).json({ message: "Vous aimez la sauce !"})
+
             }
             else {
-                res.status(400).json({error : "Vous avez déja aimé la sauce"})
+                res.status(403).json({error : "Vous ne pouvez pas like la sauce"})
             }
         }
         else if (like === 0) {
@@ -84,6 +87,7 @@ exports.likeSauce = (req, res, next) => {
               sauce.likes--
               sauce.save()
               console.log(sauce)
+              res.status(200).json({ message: "Vous avez retiré votre like !"})
            }
            else if (sauce.usersDisliked.includes(userId)){
             const usersDislikedPosition = sauce.usersDisliked.indexOf(userId)
@@ -91,13 +95,15 @@ exports.likeSauce = (req, res, next) => {
             sauce.dislikes--
             sauce.save()
             console.log(sauce)
+            res.status(200).json({ message: "Vous avez retiré votre dislike !"})
+
             }
             else {
-                res.status(400).json({error : "Vous avez déja unlike la sauce"})
+                res.status(403).json({error : "Vous avez déja retiré votre vote"})
             }
         }
         else {
-           console.log('Erreur')
+            res.status(400).json({error : "valeur de like non valide"})
         }
      }
 
@@ -113,7 +119,6 @@ exports.likeSauce = (req, res, next) => {
             else {
                 gestionDeLikes(sauce)
             }
-            res.status(200).json({ message: 'like updated !'})
         })
         .catch(error => res.status(400).json({ error }));
     }

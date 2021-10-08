@@ -1,26 +1,37 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 const User = require('../models/modelUser');
 
 exports.signup = (req, res, next) => {
-    //create hash for passord (10 = number of hash makes)
-    bcrypt.hash(req.body.password, 10)
-    .then(hash => {
-        //create new user with ID and hashed password
-        const user = new User({
-            email: req.body.email,
-            password: hash
-        });
-        // save user infos in DB
-        user.save()
-        .then(() => res.status(201).json({ message:'Utilisateur créé !'}))
-        .catch(error => res.status(400).json({error}));
-    })
-    .catch(error => res.status(500).json({error}));
+    //put validator here
+    let validateMail = validator.isEmail(req.body.email)
+    let validatePwd = validator.isStrongPassword(req.body.password)
+    if ((validateMail === true) && (validatePwd === true)){
+        //create hash for passord (10 = number of hash makes)
+        bcrypt.hash(req.body.password, 10)
+        .then(hash => {
+            //create new user with ID and hashed password
+            const user = new User({
+                email: req.body.email,
+                password: hash
+            });
+            // save user infos in DB
+            user.save()
+            .then(() => res.status(201).json({ message:'Utilisateur créé !'}))
+            .catch(error => res.status(400).json({error}));
+        })
+        .catch(error => res.status(500).json({error}));
+    }
+    else{
+        res.status(401).json({ message:'email ou mot de passe non valide'});
+    }
 };
-
 exports.login = (req, res, next) => {
+    console.log("validite email:" + validator.isEmail(req.body.email))
+    console.log("validite pwd:" + validator.isStrongPassword(req.body.password))
+
     //Find user in DB
     User.findOne({ email: req.body.email})
         .then(user => {
