@@ -1,15 +1,27 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const dotenv = require("dotenv");
+dotenv.config();
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
 const mongoose = require('mongoose');
 
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100
+});
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 
 
 const app = express();
 
-mongoose.connect('mongodb+srv://user1:mongouser@cluster0.ntdwj.mongodb.net/piiquante?retryWrites=true&w=majority',
+
+
+mongoose.connect(process.env.APP_CONNECT,
   { useNewUrlParser: true,
     useUnifiedTopology: true})
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -22,8 +34,11 @@ app.use((req, res, next) => {
     next();
   });
 
+  
+app.use(helmet());
 app.use(bodyParser.json());
 
+app.use("/api/", apiLimiter);
 app.use('/api/sauces', saucesRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/images', express.static('images'))
