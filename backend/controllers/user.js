@@ -1,3 +1,5 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
@@ -5,7 +7,7 @@ const validator = require('validator');
 const User = require('../models/modelUser');
 
 exports.signup = (req, res, next) => {
-    //put validator here
+    //VALIDATOR
     let validateMail = validator.isEmail(req.body.email)
     let validatePwd = validator.isStrongPassword(req.body.password)
     if ((validateMail === true) && (validatePwd === true)){
@@ -29,8 +31,6 @@ exports.signup = (req, res, next) => {
     }
 };
 exports.login = (req, res, next) => {
-    console.log("validite email:" + validator.isEmail(req.body.email))
-    console.log("validite pwd:" + validator.isStrongPassword(req.body.password))
 
     //Find user in DB
     User.findOne({ email: req.body.email})
@@ -51,7 +51,7 @@ exports.login = (req, res, next) => {
                         //Create token 
                         token: jwt.sign(
                             { userId: user._id},
-                            "RANDOM_SECRET_TOKEN",
+                            process.env.SECRET_TOKEN,
                             { expiresIn: '24h'}
                         )
                     });
